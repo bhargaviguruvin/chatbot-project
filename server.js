@@ -22,18 +22,30 @@ app.post("/chat", async (req, res) => {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: userMessage }]
+        model: "gpt-4o-mini",   // ✅ updated model
+        messages: [
+          { role: "system", content: "You are a helpful chatbot." },
+          { role: "user", content: userMessage }
+        ]
       })
     });
 
     const data = await response.json();
+
+  
+    if (!data.choices) {
+      console.log("API ERROR:", data);
+      return res.json({
+        reply: "API error - check terminal"
+      });
+    }
 
     res.json({
       reply: data.choices[0].message.content
     });
 
   } catch (error) {
+    console.log("SERVER ERROR:", error);
     res.json({
       reply: "Error connecting to AI"
     });
